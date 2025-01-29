@@ -23,10 +23,7 @@ def generate_histogram(cleaned_words):
     """
     histogram = {}
     for word in cleaned_words:
-        if word not in histogram:
-            histogram[word] = 1
-        else:
-            histogram[word] += 1
+        histogram[word] = histogram.get(word, 0) + 1
     return histogram
 
 
