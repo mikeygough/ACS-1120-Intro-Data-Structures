@@ -27,3 +27,7 @@ Deactivate the Virtual Environment:
 
 To Remove a Virtual Environment:
 `sudo em -rf venv`
+
+#### flask
+
+`python app.py`
