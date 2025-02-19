@@ -23,7 +23,7 @@ class Listogram(list):
         # TODO: Increase word frequency by count
         is_new_word = not self.__contains__(word)
         if is_new_word:
-            self.append((word, 1))
+            self.append((word, count))
         else:
             word_index = self.index_of(word)
             self[word_index] = (word, self[word_index][1] + count)
