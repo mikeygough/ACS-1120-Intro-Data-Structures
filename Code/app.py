@@ -1,6 +1,7 @@
 """Main script, uses other modules to generate sentences."""
 from flask import Flask
 from dictogram import Dictogram
+from markov_chain import MarkovChain
 
 
 app = Flask(__name__)
@@ -8,14 +9,17 @@ app = Flask(__name__)
 # TODO: Initialize your histogram, hash table, or markov chain here.
 # Any code placed here will run only once, when the server starts.
 word_list = "one fish two fish red fish blue fish".split()
-histogram = Dictogram(word_list)
+# word_list = "A man, a plan, a canal: Panama! A dog, a panic in a pagoda!".split()
+# histogram = Dictogram(word_list)
+markov_chain = MarkovChain(word_list)
 
 
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    random_word = histogram.sample()
-    return "<p>Random Word: {}</p>".format(random_word)
+    # random_word = histogram.sample()
+    random_sentence = markov_chain.random_walk()
+    return "<p>Random Sentence: {}</p>".format(random_sentence)
 
 
 if __name__ == "__main__":
