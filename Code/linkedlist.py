@@ -83,9 +83,9 @@ class LinkedList:
 
         while node is not None:
             if matcher(node.data):
-                return True
+                return node.data
             node = node.next
-        return False
+        return None
 
     def delete(self, item):
         """Delete the given item from this linked list, or raise ValueError."""
