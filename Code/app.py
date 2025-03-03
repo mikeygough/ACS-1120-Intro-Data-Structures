@@ -2,13 +2,15 @@
 from flask import Flask
 from dictogram import Dictogram
 from markov_chain import MarkovChain
+from helpers import get_cleaned_words
 
 
 app = Flask(__name__)
 
 # TODO: Initialize your histogram, hash table, or markov chain here.
 # Any code placed here will run only once, when the server starts.
-word_list = "one fish two fish red fish blue fish".split()
+word_list = get_cleaned_words("metamorphosis.txt")
+
 # word_list = "A man, a plan, a canal: Panama! A dog, a panic in a pagoda!".split()
 # histogram = Dictogram(word_list)
 markov_chain = MarkovChain(word_list)

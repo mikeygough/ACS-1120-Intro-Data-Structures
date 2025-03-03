@@ -10,55 +10,79 @@ class MarkovChain(dict):
     def __init__(self, word_list=None):
         """Initialize"""
         super(MarkovChain, self).__init__()
-        
-        {one: {fish: 1},
-         fish: {two: 1,
-                red: 1,
-                blue: 1},
-         blue: {fish: 1}}
 
         self.first_word = ""
-        # add new words
-        if word_list is not None:
+
+        # process words
+        if word_list is not None and len(word_list) > 0:
             self.first_word = word_list[0]
+
+            # add words
             for word in word_list:
                 self.add_new_word(word)
 
-        for index, word in enumerate(word_list):
-            if index != 0:
-                prev_word = word_list[index - 1]
-                self.add_edge(prev_word, word)
+            # add edges
+            for index, word in enumerate(word_list):
+                if index < len(word_list) - 1:
+                    next_word = word_list[index + 1]
+                    self.add_edge(word, next_word)
 
     def add_new_word(self, word):
         """Add word..."""
         is_new_word = word not in self
         if is_new_word:
             self[word] = {}
+        return is_new_word
 
-    def add_edge(self, prev_word, word, count=1):
-        self[prev_word][word] = self[prev_word].get(word, 0) + count
+    def add_edge(self, current_word, next_word, count=1):
+        if current_word not in self:
+            self.add_new_word(current_word)
+
+        if next_word not in self:
+            self.add_new_word(next_word)
+
+        self[current_word][next_word] = self[current_word].get(next_word, 0) + count
 
     def sample_edge(self, word):
+        if word not in self or not self[word]:
+            if len(self) > 0:
+                return random.choice(list(self.keys()))
+            return None
+
         word_tokens = sum(self[word].values())
-        # fix this to take into account last word
         dart = random.randint(1, word_tokens)
         fence = 0
-        for key, value in self[word].items():
-            fence += value
+        for next_word, count in self[word].items():
+            fence += count
             if dart <= fence:
-                return key
+                return next_word
 
-    def random_walk(self, count=10):
+        # fallback
+        return random.choice(list(self[word].keys()))
+
+    def random_walk(self, count=20):
+        if not self:
+            return ""
+
         sentence = []
-        for i in range(count):
-            if len(sentence) == 0:
-                sentence.append(self.first_word)
-            else:
-                sentence.append(self.sample_edge(sentence[-1]))
+        current_word = self.first_word
+
+        if not current_word and len(self) > 0:
+            current_word = random.choice(list(self.keys()))
+
+        sentence.append(current_word)
+
+        for i in range(count - 1):
+            next_word = self.sample_edge(current_word)
+            if next_word is None:
+                break
+            sentence.append(next_word)
+            current_word = next_word
+
         return " ".join(sentence)
 
     def to_s(self):
-        print(self)
+        print(str(self))
 
 
 def main():
