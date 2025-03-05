@@ -60,15 +60,20 @@ class MarkovChain(dict):
         # fallback
         return random.choice(list(self[word].keys()))
 
-    def random_walk(self, count=20):
+    def random_walk(self, count=20, first_word_mode="random"):
         if not self:
             return ""
 
         sentence = []
-        current_word = self.first_word
 
-        if not current_word and len(self) > 0:
+        if first_word_mode == "first":
+            current_word = self.first_word
+        elif first_word_mode == "random":
             current_word = random.choice(list(self.keys()))
+        else:
+            current_word = (
+                self.first_word if self.first_word else random.choice(list(self.keys()))
+            )
 
         sentence.append(current_word)
 
@@ -79,7 +84,9 @@ class MarkovChain(dict):
             sentence.append(next_word)
             current_word = next_word
 
-        return " ".join(sentence)
+        sentence = " ".join(sentence)
+        sentence += "."
+        return sentence
 
     def to_s(self):
         print(str(self))
