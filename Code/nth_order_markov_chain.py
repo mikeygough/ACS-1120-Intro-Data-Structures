@@ -4,33 +4,34 @@ from __future__ import division, print_function
 import random
 import pprint
 
-# TODO
-# Make this truly an nth order markov chain based on the order arg
-
 
 class NthOrderMarkovChain(dict):
-    def __init__(self, word_list=None, order=2):
+    def __init__(self, word_list=None, order=1):
         """Initialize"""
         super(NthOrderMarkovChain, self).__init__()
 
+        self.order = order
         self.first_node = None
 
-        for index, word in enumerate(word_list):
-            # out of range error
-            if index + 1 == len(word_list):
-                break
+        # safety check
+        if not word_list or len(word_list) <= order:
+            return
 
+        for index in range(len(word_list) - order):
             # create current_node
-            current_node = (word, word_list[index + 1])
+            current_node = tuple(word_list[index : index + order])
+
             if not self.first_node:
                 self.first_node = current_node
 
             # create next_node
-            # if last node, circle around
-            if index + order > (len(word_list) - 1):
-                next_node = (word_list[0], word_list[1])
+            # near the end... wrap
+            if index + order + 1 > len(word_list):
+                remaining = order - (len(word_list) - (index + 1))
+                next_words = word_list[index + 1 :] + word_list[:remaining]
+                next_node = tuple(next_words)
             else:
-                next_node = (word_list[index + 1], word_list[index + 2])
+                next_node = tuple(word_list[index + 1 : index + order + 1])
 
             # add if new
             if current_node not in self:
@@ -46,6 +47,10 @@ class NthOrderMarkovChain(dict):
         self[current_node][next_node] = self[current_node].get(next_node, 0) + count
 
     def sample_edge(self, node):
+        # safety check
+        if node not in self or not self[node]:
+            return None
+
         node_tokens = sum(self[node].values())
         dart = random.randint(1, node_tokens)
         fence = 0
@@ -53,22 +58,36 @@ class NthOrderMarkovChain(dict):
             fence += count
             if dart <= fence:
                 return next_node
+        return None
 
     def random_walk(self, count=5, first_word_mode="random"):
+        # safety check
+        if not self:
+            return ""
+
         output = []
 
+        # choose starting node
         if first_word_mode == "first":
             current_node = self.first_node
-            output.append(self.first_node[0])
         else:
             current_node = random.choice(list(self.keys()))
 
-        for i in range(count - 1):
+        # add words
+        output.extend(current_node)
+
+        words_added = len(current_node)
+
+        while words_added < count:
             next_node = self.sample_edge(current_node)
-            output.append(next_node[0])
+            if not next_node:
+                break
+
+            output.append(next_node[-1])
+            words_added += 1
             current_node = next_node
 
-        return " ".join(output) + "."
+        return " ".join(output[:count]) + "."
 
     def to_s(self):
         print(str(self))

@@ -11,13 +11,13 @@ from helpers import get_cleaned_words
 app = Flask(__name__)
 
 word_list = get_cleaned_words("metamorphosis.txt")
-markov_chain = NthOrderMarkovChain(word_list)
+markov_chain = NthOrderMarkovChain(word_list, order=3)
 
 
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    random_sentence = markov_chain.random_walk(10)
+    random_sentence = markov_chain.random_walk(101)
     html_template = """
     <!DOCTYPE html>
     <html lang="en">
