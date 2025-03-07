@@ -1,20 +1,23 @@
 """Main script, uses other modules to generate sentences."""
+
 from flask import Flask, render_template_string
-from dictogram import Dictogram
-from markov_chain import MarkovChain
+
+# from dictogram import Dictogram
+# from markov_chain import MarkovChain
+from nth_order_markov_chain import NthOrderMarkovChain
 from helpers import get_cleaned_words
 
 
 app = Flask(__name__)
 
 word_list = get_cleaned_words("metamorphosis.txt")
-markov_chain = MarkovChain(word_list)
+markov_chain = NthOrderMarkovChain(word_list)
 
 
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    random_sentence = markov_chain.random_walk()
+    random_sentence = markov_chain.random_walk(10)
     html_template = """
     <!DOCTYPE html>
     <html lang="en">
